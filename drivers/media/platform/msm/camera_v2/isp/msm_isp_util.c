@@ -14,12 +14,12 @@
 #include <media/v4l2-subdev.h>
 #include <linux/ratelimit.h>
 
-#include "msm.h"
+#include "../msm.h"
 #include "msm_isp_util.h"
 #include "msm_isp_axi_util.h"
 #include "msm_isp_stats_util.h"
-#include "msm_camera_io_util.h"
-#include "cam_smmu_api.h"
+#include "../common/msm_camera_io_util.h"
+#include "../common/cam_smmu_api.h"
 #define CREATE_TRACE_POINTS
 #include "trace/events/msm_cam.h"
 
