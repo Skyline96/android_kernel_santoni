@@ -1,0 +1,11 @@
+#!/bin/bash
+
+rm -f repack_zip/boot/zImage
+
+mv arch/arm64/boot/Image.gz-dtb repack_zip/boot/zImage
+
+cd repack_zip
+
+DATE=`date +%d-%m-%Y`;
+zip -r ../../release_santoni/Clarity-Santoni-$DATE.zip *
+
