@@ -3,6 +3,7 @@
 rm -f repack_zip/boot/zImage
 
 mv arch/arm64/boot/Image.gz-dtb repack_zip/boot/zImage
+find -name "*.ko" -exec mv {} repack_zip/system/lib/modules \;
 
 cd repack_zip
 
