@@ -291,7 +291,7 @@ module_param_named(
 );
 
 char *fg_batt_type;
-static char *FG_BATT_TYPE_DEFAULT = "Default_Coslight_4000mah";
+static char *FG_BATT_TYPE_DEFAULT = "qrd_msm8937_Coslight_4100mah";
 
 module_param_named(
 	battery_type, fg_batt_type, charp, S_IRUSR | S_IWUSR
