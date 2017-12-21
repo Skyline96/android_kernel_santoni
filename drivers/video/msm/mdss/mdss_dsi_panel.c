@@ -22,6 +22,7 @@
 #include <linux/qpnp/pwm.h>
 #include <linux/err.h>
 #include <linux/string.h>
+#include <linux/lcd_notify.h>
 
 #include "mdss_dsi.h"
 #ifdef TARGET_HW_MDSS_HDMI
@@ -861,6 +862,8 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 		return -EINVAL;
 	}
 
+	lcd_notifier_call_chain(LCD_EVENT_ON_START);
+
 	pinfo = &pdata->panel_info;
 	ctrl = container_of(pdata, struct mdss_dsi_ctrl_pdata,
 				panel_data);
@@ -893,6 +896,8 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 	mdss_dsi_panel_apply_display_setting(pdata, pinfo->persist_mode);
 
 end:
+	lcd_notifier_call_chain(LCD_EVENT_ON_END);
+
 	pr_debug("%s:-\n", __func__);
 	return ret;
 }
@@ -977,6 +982,8 @@ static int mdss_dsi_panel_off(struct mdss_panel_data *pdata)
 		return -EINVAL;
 	}
 
+	lcd_notifier_call_chain(LCD_EVENT_OFF_START);
+
 	pinfo = &pdata->panel_info;
 	ctrl = container_of(pdata, struct mdss_dsi_ctrl_pdata,
 				panel_data);
@@ -994,8 +1001,11 @@ static int mdss_dsi_panel_off(struct mdss_panel_data *pdata)
 	mdss_dsi_panel_off_hdmi(ctrl, pinfo);
 
 end:
+	lcd_notifier_call_chain(LCD_EVENT_OFF_END);
+
 	/* clear idle state */
 	ctrl->idle = false;
+
 	pr_debug("%s:-\n", __func__);
 	return 0;
 }
