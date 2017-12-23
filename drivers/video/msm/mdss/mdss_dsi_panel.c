@@ -26,6 +26,9 @@
 #ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
 #include <linux/input/doubletap2wake.h>
 #endif
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
+#include <linux/input/sweep2wake.h>
+#endif
 
 #include "mdss_dsi.h"
 #ifdef TARGET_HW_MDSS_HDMI
@@ -865,6 +868,10 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 		return -EINVAL;
 	}
 
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
+	s2w_scr_suspended = false;
+#endif
+
 #ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
 	dt2w_scr_suspended = false;
 #endif
@@ -987,6 +994,10 @@ static int mdss_dsi_panel_off(struct mdss_panel_data *pdata)
 		pr_err("%s: Invalid input data\n", __func__);
 		return -EINVAL;
 	}
+
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
+	s2w_scr_suspended = true;
+#endif
 
 #ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
 	dt2w_scr_suspended = true;

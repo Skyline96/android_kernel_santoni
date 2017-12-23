@@ -55,9 +55,9 @@ MODULE_LICENSE("GPLv2");
 #define DT2W_DEBUG		0
 #define DT2W_DEFAULT		0
 
-#define DT2W_PWRKEY_DUR		60
-#define DT2W_FEATHER		200
-#define DT2W_TIME		700
+#define DT2W_PWRKEY_DUR		20
+#define DT2W_FEATHER		100
+#define DT2W_TIME		500
 
 /* Resources */
 int dt2w_switch = DT2W_DEFAULT;
@@ -398,5 +398,5 @@ static void __exit doubletap2wake_exit(void)
 	return;
 }
 
-late_initcall(doubletap2wake_init);
+module_init(doubletap2wake_init);
 module_exit(doubletap2wake_exit);

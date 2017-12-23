@@ -39,6 +39,7 @@
 
 #ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
 #include <linux/input/doubletap2wake.h>
+#include <linux/input/sweep2wake.h>
 #endif
 
 #if defined(CONFIG_FB)
@@ -591,7 +592,8 @@ static int ft5x06_ts_suspend(struct device *dev)
 	int err;
 
 #ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
-	if (dt2w_switch > 0)
+	if ((dt2w_switch > 0) || 
+		(s2w_switch == 1))
 		return 0;
 #endif
 
