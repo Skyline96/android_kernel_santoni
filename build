@@ -5,6 +5,7 @@ SUB=$2
 
 rm -f repack_zip/boot/zImage
 rm -f repack_zip/system/lib/modules/*.ko
+rm -f repack_zip/system/lib/modules/pronto/*.ko
 
 if [ ! -d repack_zip/system ]; then
 	mkdir repack_zip/system
