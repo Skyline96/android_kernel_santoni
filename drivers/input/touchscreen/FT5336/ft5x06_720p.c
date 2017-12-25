@@ -64,6 +64,10 @@ u8 tp_color;
 
 static u8 TP_Maker, LCD_Maker;
 
+#ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
+static bool ev_abs_status = false;
+#endif
+
 #define FT_DEBUG_DIR_NAME   "ts_debug"
 
 #define TPD_MAX_POINTS_5    5
@@ -593,8 +597,14 @@ static int ft5x06_ts_suspend(struct device *dev)
 
 #ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
 	if ((dt2w_switch > 0) || 
-		(s2w_switch == 1))
+		(s2w_switch == 1)) {
+		if (!ev_abs_status) {
+			__clear_bit(EV_KEY, data->input_dev->evbit);
+			input_sync(data->input_dev);
+			ev_abs_status = true;
+		}
 		return 0;
+	}
 #endif
 
 	if (data->loading_fw) {
@@ -657,6 +667,17 @@ static int ft5x06_ts_resume(struct device *dev)
 {
 	struct ft5x06_ts_data *data = dev_get_drvdata(dev);
 	int err;
+
+#ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
+	if ((dt2w_switch > 0) || 
+		(s2w_switch == 1)) {
+		if (ev_abs_status) {
+			__set_bit(EV_KEY, data->input_dev->evbit);
+			input_sync(data->input_dev);
+			ev_abs_status = false;
+		}
+	}
+#endif
 
 	if (!data->suspended) {
 		dev_dbg(dev, "Already in awake state\n");
