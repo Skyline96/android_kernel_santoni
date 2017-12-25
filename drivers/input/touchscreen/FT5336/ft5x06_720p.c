@@ -596,8 +596,8 @@ static int ft5x06_ts_suspend(struct device *dev)
 	int err;
 
 #ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
-	if ((dt2w_switch > 0) || 
-		(s2w_switch == 1)) {
+	if ((dt2w_switch > 0 ||s2w_switch == 1) &&
+		!gesture_wake_incall) {
 		if (!ev_abs_status) {
 			__clear_bit(EV_KEY, data->input_dev->evbit);
 			input_sync(data->input_dev);
