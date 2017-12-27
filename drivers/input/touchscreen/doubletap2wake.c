@@ -213,7 +213,7 @@ static void dt2w_input_event(struct input_handle *handle, unsigned int type,
 	if ((touch_x_called || touch_y_called) && touch_cnt)  {
 		touch_x_called = false;
 		touch_y_called = false;
-		queue_work_on(0, dt2w_input_wq, &dt2w_input_work);
+		queue_work(dt2w_input_wq, &dt2w_input_work);
 	}
 }
 
@@ -352,7 +352,7 @@ static int __init doubletap2wake_init(void)
 		goto err_input_dev;
 	}
 
-	dt2w_input_wq = create_workqueue("dt2wiwq");
+	dt2w_input_wq = alloc_workqueue("dt2wiwq", WQ_HIGHPRI, 0);
 	if (!dt2w_input_wq) {
 		pr_err("%s: Failed to create dt2wiwq workqueue\n", __func__);
 		return -EFAULT;
