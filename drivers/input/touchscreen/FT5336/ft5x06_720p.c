@@ -65,7 +65,7 @@ u8 tp_color;
 static u8 TP_Maker, LCD_Maker;
 
 #ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
-static bool ev_abs_status = false;
+static bool ev_btn_status = false;
 #endif
 
 #define FT_DEBUG_DIR_NAME   "ts_debug"
@@ -596,12 +596,11 @@ static int ft5x06_ts_suspend(struct device *dev)
 	int err;
 
 #ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
-	if ((dt2w_switch > 0 ||s2w_switch == 1) &&
+	if ((dt2w_switch > 0 || s2w_switch == 1) &&
 		!gesture_wake_incall) {
-		if (!ev_abs_status) {
-			__clear_bit(EV_KEY, data->input_dev->evbit);
-			input_sync(data->input_dev);
-			ev_abs_status = true;
+		if (!ev_btn_status) {
+			__clear_bit(BTN_TOUCH, data->input_dev->keybit);
+			ev_btn_status = true;
 		}
 		return 0;
 	}
@@ -671,10 +670,10 @@ static int ft5x06_ts_resume(struct device *dev)
 #ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
 	if ((dt2w_switch > 0) || 
 		(s2w_switch == 1)) {
-		if (ev_abs_status) {
-			__set_bit(EV_KEY, data->input_dev->evbit);
+		if (ev_btn_status) {
+			__set_bit(BTN_TOUCH, data->input_dev->keybit);
 			input_sync(data->input_dev);
-			ev_abs_status = false;
+			ev_btn_status = false;
 		}
 	}
 #endif
