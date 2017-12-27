@@ -30,6 +30,7 @@
 #include <linux/workqueue.h>
 #include <linux/input.h>
 #include <linux/hrtimer.h>
+#include <linux/lcd_notify.h>
 
 /* uncomment since no touchscreen defines android touch, do that here */
 //#define ANDROID_TOUCH_DECLARED
@@ -80,13 +81,13 @@ MODULE_LICENSE("GPLv2");
 
 /* Resources */
 int s2w_switch = 0;
-bool s2w_scr_suspended = false;
 static int s2w_debug = 0;
 static int s2w_pwrkey_dur = 60;
 static int touch_x = 0, touch_y = 0;
 static bool touch_x_called = false, touch_y_called = false;
-static bool exec_count = true;
+static bool s2w_scr_suspended = false, exec_count = true;
 static bool scr_on_touch = false, barrier[2] = {false, false};
+static struct notifier_block s2w_notif;
 static struct input_dev * sweep2wake_pwrdev;
 static DEFINE_MUTEX(pwrkeyworklock);
 static struct workqueue_struct *s2w_input_wq;
@@ -312,6 +313,23 @@ static struct input_handler s2w_input_handler = {
 	.id_table	= s2w_ids,
 };
 
+static int s2w_notifier_callback(struct notifier_block *this,
+				unsigned long event, void *data)
+{
+	switch (event) {
+	case LCD_EVENT_ON_END:
+		s2w_scr_suspended = false;
+		break;
+	case LCD_EVENT_OFF_END:
+		s2w_scr_suspended = true;
+		break;
+	default:
+		break;
+	}
+
+	return 0;
+}
+
 /*
  * SYSFS stuff below here
  */
@@ -438,6 +456,11 @@ static int __init sweep2wake_init(void)
 	if (rc)
 		pr_err("%s: Failed to register s2w_input_handler\n", __func__);
 
+	s2w_notif.notifier_call = s2w_notifier_callback;
+	if (lcd_register_client(&s2w_notif) != 0) {
+		pr_err("%s: Failed to register lcd callback\n", __func__);
+	}
+
 #ifndef ANDROID_TOUCH_DECLARED
 	android_touch_kobj = kobject_create_and_add("android_touch", NULL) ;
 	if (android_touch_kobj == NULL) {
@@ -474,6 +497,7 @@ static void __exit sweep2wake_exit(void)
 #ifndef ANDROID_TOUCH_DECLARED
 	kobject_del(android_touch_kobj);
 #endif
+	lcd_unregister_client(&s2w_notif);
 	input_unregister_handler(&s2w_input_handler);
 	destroy_workqueue(s2w_input_wq);
 	input_unregister_device(sweep2wake_pwrdev);
