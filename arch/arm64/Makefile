@@ -17,14 +17,6 @@ GZFLAGS		:=-9
 
 KBUILD_DEFCONFIG := defconfig
 
-ARM64_FLAGS	:= $(call cc-option,-march=armv8-a+crc+crypto+simd) \
-		   $(call cc-option,-mcpu=cortex-a53+crc+crypto+simd) \
-		   $(call cc-option,-mtune=cortex-a53)
-KBUILD_CFLAGS	+= $(ARM64_FLAGS)
-KBUILD_AFLAGS	+= $(ARM64_FLAGS)
-KBUILD_CFLAGS_MODULE	+= $(ARM64_FLAGS)
-KBUILD_AFLAGS_MODULE	+= $(ARM64_FLAGS)
-
 KBUILD_CFLAGS	+= -mgeneral-regs-only
 KBUILD_CFLAGS	+= -fno-pic
 KBUILD_CFLAGS	+= $(call cc-option, -mpc-relative-literal-loads)
