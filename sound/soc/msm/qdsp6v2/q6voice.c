@@ -19,7 +19,6 @@
 #include <linux/msm_audio_ion.h>
 
 #ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
-#include <linux/input/doubletap2wake.h>
 #include <linux/input/sweep2wake.h>
 #include <linux/input/ft5x06_720p.h>
 #endif
@@ -5833,7 +5832,7 @@ int voc_end_voice_call(uint32_t session_id)
 	}
 
 #ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
-	if (dt2w_switch > 0 || s2w_switch == 1)
+	if (s2w_switch == 1)
 		gesture_wake_incall = false;
 #endif
 
@@ -5882,7 +5881,7 @@ int voc_standby_voice_call(uint32_t session_id)
 	pr_debug("%s: voc state=%d", __func__, v->voc_state);
 
 #ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
-	if (dt2w_switch > 0 || s2w_switch == 1)
+	if (s2w_switch == 1)
 		gesture_wake_incall = true;
 #endif
 
@@ -6077,7 +6076,7 @@ int voc_resume_voice_call(uint32_t session_id)
 	int ret = 0;
 
 #ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
-	if (dt2w_switch > 0 || s2w_switch == 1)
+	if (s2w_switch == 1)
 		gesture_wake_incall = true;
 #endif
 
@@ -6104,7 +6103,7 @@ int voc_start_voice_call(uint32_t session_id)
 	}
 
 #ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
-	if (dt2w_switch > 0 || s2w_switch == 1)
+	if (s2w_switch == 1)
 		gesture_wake_incall = true;
 #endif
 
