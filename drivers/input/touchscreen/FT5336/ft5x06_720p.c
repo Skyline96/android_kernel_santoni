@@ -617,7 +617,14 @@ static int ft5x06_ts_suspend(struct device *dev)
 	if ((dt2w_switch > 0 || s2w_switch == 1) &&
 		!gesture_wake_incall) {
 		if (!ev_btn_status) {
+			/* release all touches */
+			for (i = 0; i < data->pdata->num_max_touches; i++) {
+				input_mt_slot(data->input_dev, i);
+				input_mt_report_slot_state(data->input_dev, MT_TOOL_FINGER, 0);
+			}
+			input_mt_report_pointer_emulation(data->input_dev, false);
 			__clear_bit(BTN_TOUCH, data->input_dev->keybit);
+			input_sync(data->input_dev);
 			ev_btn_status = true;
 		}
 		ft5x06_irq_handler(data->client->irq, true);
