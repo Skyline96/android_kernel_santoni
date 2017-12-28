@@ -38,6 +38,7 @@
 #endif
 
 #ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
+#include <linux/input/doubletap2wake.h>
 #include <linux/input/sweep2wake.h>
 #endif
 
@@ -595,7 +596,7 @@ static int ft5x06_ts_suspend(struct device *dev)
 	int err;
 
 #ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
-	if (s2w_switch == 1 &&
+	if ((dt2w_switch > 0 || s2w_switch == 1) &&
 		!gesture_wake_incall) {
 		if (!ev_btn_status) {
 			__clear_bit(BTN_TOUCH, data->input_dev->keybit);
@@ -667,7 +668,8 @@ static int ft5x06_ts_resume(struct device *dev)
 	int err;
 
 #ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
-	if (s2w_switch == 1) {
+	if ((dt2w_switch > 0) || 
+		(s2w_switch == 1)) {
 		if (ev_btn_status) {
 			__set_bit(BTN_TOUCH, data->input_dev->keybit);
 			input_sync(data->input_dev);
