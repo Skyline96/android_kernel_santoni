@@ -588,6 +588,24 @@ static int ft5x06_ts_pinctrl_select(struct ft5x06_ts_data *ft5x06_data, bool on)
 	return 0;
 }
 
+#ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
+static bool ft5x06_irq_active = false;
+static void ft5x06_irq_handler(int irq, bool active)
+{
+	if (active) {
+		if (!ft5x06_irq_active) {
+			enable_irq_wake(irq);
+			ft5x06_irq_active = true;
+		}
+	} else {
+		if (ft5x06_irq_active) {
+			disable_irq_wake(irq);
+			ft5x06_irq_active = false;
+		}
+	}
+}
+#endif
+
 #ifdef CONFIG_PM
 static int ft5x06_ts_suspend(struct device *dev)
 {
@@ -602,6 +620,7 @@ static int ft5x06_ts_suspend(struct device *dev)
 			__clear_bit(BTN_TOUCH, data->input_dev->keybit);
 			ev_btn_status = true;
 		}
+		ft5x06_irq_handler(data->client->irq, true);
 		return 0;
 	}
 #endif
@@ -674,7 +693,8 @@ static int ft5x06_ts_resume(struct device *dev)
 			__set_bit(BTN_TOUCH, data->input_dev->keybit);
 			input_sync(data->input_dev);
 			ev_btn_status = false;
-		}
+		}		
+		ft5x06_irq_handler(data->client->irq, false);
 	}
 #endif
 
