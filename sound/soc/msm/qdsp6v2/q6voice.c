@@ -18,12 +18,6 @@
 #include <linux/mutex.h>
 #include <linux/msm_audio_ion.h>
 
-#ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
-#include <linux/input/doubletap2wake.h>
-#include <linux/input/sweep2wake.h>
-#include <linux/input/ft5x06_720p.h>
-#endif
-
 #include <soc/qcom/socinfo.h>
 #include <linux/qdsp6v2/apr_tal.h>
 
@@ -128,10 +122,6 @@ static int voice_send_get_sound_focus_cmd(struct voice_data *v,
 				struct sound_focus_param *soundFocusData);
 static int voice_send_get_source_tracking_cmd(struct voice_data *v,
 			struct source_tracking_param *sourceTrackingData);
-
-#ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
-bool gesture_wake_incall = false;
-#endif
 
 static void voice_itr_init(struct voice_session_itr *itr,
 			   u32 session_id)
@@ -5832,11 +5822,6 @@ int voc_end_voice_call(uint32_t session_id)
 		return -EINVAL;
 	}
 
-#ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
-	if (dt2w_switch > 0 || s2w_switch == 1)
-		gesture_wake_incall = false;
-#endif
-
 	mutex_lock(&v->lock);
 
 	if (v->voc_state == VOC_RUN || v->voc_state == VOC_ERROR ||
@@ -5880,11 +5865,6 @@ int voc_standby_voice_call(uint32_t session_id)
 		return -EINVAL;
 	}
 	pr_debug("%s: voc state=%d", __func__, v->voc_state);
-
-#ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
-	if (dt2w_switch > 0 || s2w_switch == 1)
-		gesture_wake_incall = true;
-#endif
 
 	if (v->voc_state == VOC_RUN) {
 		apr_mvm = common.apr_q6_mvm;
@@ -6076,11 +6056,6 @@ int voc_resume_voice_call(uint32_t session_id)
 	struct voice_data *v = voice_get_session(session_id);
 	int ret = 0;
 
-#ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
-	if (dt2w_switch > 0 || s2w_switch == 1)
-		gesture_wake_incall = true;
-#endif
-
 	ret = voice_send_start_voice_cmd(v);
 	if (ret < 0) {
 		pr_err("Fail in sending START_VOICE\n");
@@ -6102,11 +6077,6 @@ int voc_start_voice_call(uint32_t session_id)
 
 		return -EINVAL;
 	}
-
-#ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
-	if (dt2w_switch > 0 || s2w_switch == 1)
-		gesture_wake_incall = true;
-#endif
 
 	mutex_lock(&v->lock);
 
